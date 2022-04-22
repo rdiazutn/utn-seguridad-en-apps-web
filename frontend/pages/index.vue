@@ -1,83 +1,72 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card class="logo py-4 d-flex justify-center">
-        <NuxtLogo />
-        <VuetifyLogo />
-      </v-card>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
+  <v-row justify="center" align="center" class="h-100">
+    <v-col cols="12" sm="8" md="6" lg="4">
+      <v-form ref="form" @submit.prevent="login">
+        <v-card>
+          <v-card-title class="justify-center">
+            Ingreso a HackMePlease
+          </v-card-title>
+          <div class="mb-4 d-flex justify-center">
+            <v-progress-circular v-if="loading" indeterminate color="primary" />
+            <v-icon v-else :color="valid ? 'primary' : 'error'" large>
+              mdi-lock
+            </v-icon>
           </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+          <v-card-text class="mb-4">
+            <div>
+              Bienvenido a HackMePlease el mejor sistema de TODO's. Totalmente seguro y libre de vulnerabiliadades <strong>?</strong>.
+            </div>
+            <div class="my-2">
+              <v-text-field
+                v-model="form.username"
+                placeholder="Ingrese su usuario aquí"
+                label="Usuario"
+                :rules="[v => !!v || 'Por favor ingrese su usuario']"
+              />
+            </div>
+            <div class="my-2">
+              <v-text-field
+                v-model="form.password"
+                :type="showPassword ? 'showPassword' : 'password'"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                placeholder="Ingrese contraseña aquí"
+                label="Contraseña"
+                :rules="[v => !!v || 'Por favor ingrese su contraseña']"
+                @click:append="showPassword = !showPassword"
+              />
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" type="submit" block>
+              Ingresar
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
     </v-col>
   </v-row>
 </template>
-
 <script>
 export default {
-  name: 'IndexPage'
+  layout: 'login',
+  data: () => ({
+    form: {
+      username: '',
+      password: ''
+    },
+    valid: true,
+    loading: false,
+    showPassword: false
+  }),
+  methods: {
+    login () {
+      this.valid = this.$refs.form.validate()
+      if (!this.valid) {
+        return
+      }
+      this.loading = true
+      console.log('login')
+    }
+  }
 }
 </script>
