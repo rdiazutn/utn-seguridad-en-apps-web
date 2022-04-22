@@ -27,10 +27,12 @@
             <div class="my-2">
               <v-text-field
                 v-model="form.password"
-                type="password"
+                :type="showPassword ? 'showPassword' : 'password'"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 placeholder="Ingrese contraseña aquí"
                 label="Contraseña"
                 :rules="[v => !!v || 'Por favor ingrese su contraseña']"
+                @click:append="showPassword = !showPassword"
               />
             </div>
           </v-card-text>
@@ -53,7 +55,8 @@ export default {
       password: ''
     },
     valid: true,
-    loading: false
+    loading: false,
+    showPassword: false
   }),
   methods: {
     login () {
