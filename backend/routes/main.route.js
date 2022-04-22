@@ -4,15 +4,15 @@ const controller = require('../controllers/example.controller')
 require('dotenv').config()
 
 
-router.get(process.env.SANDBOX_URL,[
+router.get('/data',[
 ], controller.logInput)
-router.post(process.env.SANDBOX_URL,[
+router.post('/data',[
 ], controller.logInput)
-router.put(process.env.SANDBOX_URL,[
+router.put('/data',[
 ], controller.logInput)
-router.patch(process.env.SANDBOX_URL,[
+router.patch('/data',[
 ], controller.logInput)
-router.delete(process.env.SANDBOX_URL,[
+router.delete('/data',[
 ], controller.logInput)
 
 
