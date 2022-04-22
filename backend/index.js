@@ -1,15 +1,9 @@
-const express = require('express')
-const app = express()
-const cors = require('cors')
+const Server = require('./server/app')
+//new Server();
 
-// Middlewares
-app.use(express.json())
-app.use(cors())
+const connection = require('./database/database.config')
 
-// Default route
-app.get('/', (req, res) => {
-  res.send('Is working')
-})
-
-
-app.listen(8080, () => console.log('Listening on port 8080'))
+connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
+    if (error) throw error;
+    return console.log(results[0]);
+  });
