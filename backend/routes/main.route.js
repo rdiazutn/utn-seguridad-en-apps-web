@@ -4,16 +4,18 @@ const controller = require('../controllers/example.controller')
 require('dotenv').config()
 
 
-router.get('/data',[
-], controller.logInput)
-router.post('/data',[
-], controller.logInput)
-router.put('/data',[
-], controller.logInput)
-router.patch('/data',[
-], controller.logInput)
-router.delete('/data',[
-], controller.logInput)
+
+router.get('/todos',[
+], controller.getTodos)
+
+router.post('/todos',[
+], controller.createTodos)
+
+router.delete('/todos',[
+], controller.deleteTodo)
+
+router.post('/login',[
+], controller.login)
 
 
 module.exports = router
