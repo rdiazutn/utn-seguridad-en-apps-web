@@ -12,11 +12,16 @@ const Todos = require('../domain/todo')
     })
   })
 
-  const getUserAndTodosByToken = async(token) => connection.execute(`SELECT * FROM user u join todo t on t.id_user=u.id WHERE u.token='${token}';`).then((results) => {
-      const {id,username,password, ...others} = results[0]
-      const user = new User({id,username,password})
-      const todos = results.map(data => {data.desc, data.todo_id})
-      return {user, todos};
+  const getUserAndTodosByToken = (token) => connection.then((realConnection) => {
+        return realConnection.execute(`SELECT * FROM user u join todo t on t.user_id=u.id WHERE u.token='${token}';`).then((results) => {
+            if(results[0] && results[0][0]){
+                const {id,username,password} = results[0][0]
+                const user = new User({id,username,password})
+                const todos = results[0].map(data => {return {desc: data.desc, id:data.id}})
+                return {user, todos};
+            }
+            return {user: null, todos:null}
+        })
   }) 
 
   const saveToken = async(token, userId) => await connection.then(async(connection) => {

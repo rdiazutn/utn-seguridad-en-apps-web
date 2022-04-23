@@ -67,19 +67,17 @@ const createTodoUnsafe  = (req, resp)  => {
     }
 }
 
-const getTodos = (req, resp) => {
+const getTodos = async(req, resp) => {
     const {cookies} = req
-    const {user, todos} = queries.getUserAndTodosByToken(cookies.token).then( (user) => {
+    try {
+        const {user, todos} = await queries.getUserAndTodosByToken(cookies.token)
         if (!user) {
-          return resp.status(401)
+            return resp.status(401).json({msg: 'Unauthorized'})
         }
-        resp.status(200).json({
-            ...user,
-            todos
-        })
-    }).catch((err)=>{
+        resp.status(200).json({...user,todos})
+    } catch(err) {
         return resp.status(500).json({err})
-    })
+    }
 }
 
 module.exports = {
