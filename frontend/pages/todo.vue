@@ -34,7 +34,7 @@
           <div class="mt-2">
             <v-list>
               <transition-group name="list" mode="out-in" tag="div">
-                <div v-for="(todo, index) in todos" :key="index">
+                <div v-for="(todo, index) in todos" :key="todo">
                   <v-list-item>
                     <v-list-item-content>
                       <v-list-item-title>{{ todo.text }}</v-list-item-title>

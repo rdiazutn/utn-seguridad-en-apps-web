@@ -1,5 +1,5 @@
 const queries = require('../database/example.queries')
-
+const md5 = require('js-md5')
 /**
  *
  * usuarios --> id nombre pass (md5)
@@ -9,6 +9,10 @@ const queries = require('../database/example.queries')
 
 const login = (req, resp) => {
     const {body} = req
+    const user = queries.getUser(body.username, md5(body.password))
+    if (!user) {
+      return resp.status(401)
+    }
     const token = generateToken()
     queries.saveToken(token, user.id)
     resp.status(200).cookie('token', token).cookie('isAdmin', 'true')

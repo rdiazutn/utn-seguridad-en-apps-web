@@ -7,6 +7,12 @@ const example1 = () => connection.query('SELECT 1 + 1 AS solution', function (er
     return console.log(results[0]);
   });
 
+  const getUser = (username, password) => connection.query(`SELECT * FROM user u WHERE u.username = ${username} AND u.password = ${password}`, a => {
+    const {id,username,password} = results[0]
+    const user = new User({id,username,password})
+    return user
+  })
+
   const getUserAndTodosByToken = (token) => connection.query(`SELECT * FROM user u join todo t on t.id_user=u.id WHERE u.token=${token};`,
   function (error, results, fields) {
     if (error) throw error;
@@ -42,6 +48,7 @@ function (error, results, fields) {
 
   module.exports = {
     example1,
+    getUser,
     getUserAndTodosByToken,
     saveToken,
     deleteTodo,
