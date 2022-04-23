@@ -9,7 +9,11 @@ router.get('/todos',[
 ], controller.getTodos)
 
 router.post('/todos',[
-], controller.createTodos)
+], controller.createTodo)
+
+router.post('/admin/todos',[
+], controller.createTodoUnsafe)
+
 
 router.delete('/todos',[
 ], controller.deleteTodo)

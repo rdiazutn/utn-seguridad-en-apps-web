@@ -28,7 +28,13 @@ const example1 = () => connection.query('SELECT 1 + 1 AS solution', function (er
     return 'OK';
   });
 
-  const createTodo = (desc, userId) => connection.query(`INSERT INTO todo (descripcion, user_id) t VALUES (${desc}, ${userId})`,
+// TODO: validar injection en createTodo description
+const createTodo =(desc, userId) => connection.query(`INSERT INTO todo (descripcion, user_id) t VALUES (${desc}, ${userId})`,
+function (error, results, fields) {
+  if (error) throw error;
+  return 'OK';
+});
+  const createTodoUnsafe = (desc, userId) => connection.query(`INSERT INTO todo (descripcion, user_id) t VALUES (${desc}, ${userId})`,
   function (error, results, fields) {
     if (error) throw error;
     return 'OK';
@@ -39,5 +45,6 @@ const example1 = () => connection.query('SELECT 1 + 1 AS solution', function (er
     getUserAndTodosByToken,
     saveToken,
     deleteTodo,
-    createTodo
+    createTodo,
+    createTodoUnsafe
   }

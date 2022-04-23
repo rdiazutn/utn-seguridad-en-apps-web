@@ -9,9 +9,9 @@ const queries = require('../database/example.queries')
 
 const login = (req, resp) => {
     const {body} = req
-    const token = generateToken();
+    const token = generateToken()
     queries.saveToken(token, user.id)
-    resp.status(200).cookie('token', token).cookie('isAdmin', "true");
+    resp.status(200).cookie('token', token).cookie('isAdmin', 'true')
 }
 
 
@@ -31,16 +31,28 @@ const deleteTodo = (req, resp)  => {
     resp.status(200)
 }
 
-const createTodos  = (req, resp)  => {
+const createTodo  = (req, resp)  => {
     const {cookies, body} = req
-    if(cookies.isAdmin === "true"){
-        const user = queries.getUserByToken(cookies.token)
-        if(user.id !== body.userId){
-            return resp.status(401)
-        }
+    const user = queries.getUserByToken(cookies.token)
+    if(!user){
+        return resp.status(401)
     }
-    queries.createTodo(body.desc, body.userId)
-    resp.status(200)
+    const result = queries.createTodo(body.desc, user.id)
+    resp.status(200).json({result})
+}
+
+const createTodoUnsafe  = (req, resp)  => {
+    const {cookies, body} = req
+    const user = queries.getUserByToken(cookies.token)
+    if(!user){
+        return resp.status(401)
+    }
+    if(cookies.isAdmin === "true"){
+        result = queries.createTodoUnsafe(body.desc, user.id)
+        resp.status(200).json({result})
+    } else {
+        return resp.status(401)
+    }
 }
 
 const getTodos = (req, resp) => {
@@ -55,6 +67,7 @@ const getTodos = (req, resp) => {
 module.exports = {
     login,
     deleteTodo,
-    createTodos,
-    getTodos
+    createTodo,
+    getTodos,
+    createTodoUnsafe
 }
