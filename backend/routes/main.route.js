@@ -3,8 +3,6 @@ const router = Router()
 const controller = require('../controllers/example.controller')
 require('dotenv').config()
 
-
-
 router.get('/todos',[
 ], controller.getTodos)
 

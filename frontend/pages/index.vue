@@ -65,7 +65,14 @@ export default {
         return
       }
       this.loading = true
-      console.log('login')
+      this.$axios.$post('/api/login', {
+        username: this.form.username,
+        password: this.form.password
+      }).then(() => {
+        this.$router.push('/todo')
+      }).catch(() => {
+        this.valid = false
+      }).finally(() => { this.loading = false })
     }
   }
 }
