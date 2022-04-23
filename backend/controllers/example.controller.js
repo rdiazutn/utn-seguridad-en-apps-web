@@ -9,13 +9,20 @@ const md5 = require('js-md5')
 
 const login = async(req, resp) => {
     const {body} = req
-    const user = queries.getUser(body.username, md5(body.password))
-    console.log(user)
-    if (!user) {
-      return resp.status(401)
-    }
-    const token = generateToken()
-    queries.saveToken(token, user.id)
+    try {
+
+        const user = await queries.getUser(body.username, md5(body.password))
+        if (!user) {
+            return resp.status(401)
+        }
+        const token = generateToken()
+        await queries.saveToken(token, user.id)
+    
+        return resp.status(200).cookie('token', token).cookie('isAdmin', 'true').json({msg: 'sucessfully login!'})
+        
+    }catch (err){
+        console.log('Login Error: ', err)
+        return resp.status(500).json({err})
     }
 }
 
@@ -24,7 +31,7 @@ const generateToken = () => {
     let result           = '';
     const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
-    for ( var i = 0; i < charactersLength; i++ ) {
+    for ( var i = 0; i < 20; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
    return result

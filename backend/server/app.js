@@ -6,7 +6,7 @@ class Server {
     constructor() {
         this.app = express()
         this.app.use(express.json())
-        this.app.use(cookieParser())
+        this.app.use(cookieParser());
         this.routes()
         this.start()
     }
