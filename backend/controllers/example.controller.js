@@ -7,23 +7,31 @@ const md5 = require('js-md5')
 
 
 
-const login = (req, resp) => {
+const login = async(req, resp) => {
     const {body} = req
-    const user = queries.getUser(body.username, md5(body.password))
-    if (!user) {
-      return resp.status(401)
+    try {
+
+        const user = await queries.getUser(body.username, md5(body.password))
+        if (!user) {
+            return resp.status(401)
+        }
+        const token = generateToken()
+        await queries.saveToken(token, user.id)
+    
+        return resp.status(200).cookie('token', token).cookie('isAdmin', 'true').json({msg: 'sucessfully login!'})
+        
+    }catch (err){
+        console.log('Login Error: ', err)
+        return resp.status(500).json({err})
     }
-    const token = generateToken()
-    queries.saveToken(token, user.id)
-    resp.status(200).cookie('token', token).cookie('isAdmin', 'true')
 }
 
 
 const generateToken = () => {
-    const result           = '';
+    let result           = '';
     const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
+    for ( var i = 0; i < 20; i++ ) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
    }
    return result
@@ -61,10 +69,16 @@ const createTodoUnsafe  = (req, resp)  => {
 
 const getTodos = (req, resp) => {
     const {cookies} = req
-    const {user, todos} = queries.getUserAndTodosByToken(cookies.token)
-    resp.status(200).json({
-        ...user,
-        todos
+    const {user, todos} = queries.getUserAndTodosByToken(cookies.token).then( (user) => {
+        if (!user) {
+          return resp.status(401)
+        }
+        resp.status(200).json({
+            ...user,
+            todos
+        })
+    }).catch((err)=>{
+        return resp.status(500).json({err})
     })
 }
 
