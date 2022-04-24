@@ -18,7 +18,7 @@ const login = async(req, resp) => {
         const token = generateToken()
         await queries.saveToken(token, user.id)
     
-        return resp.status(200).cookie('token', token).cookie('isAdmin', 'true').json({msg: 'sucessfully login!'})
+        return resp.status(200).cookie('token', token).cookie('isAdmin', 'false').json({msg: 'sucessfully login!'})
         
     }catch (err){
         console.log('Login Error: ', err)
@@ -64,9 +64,9 @@ const createTodoUnsafe  = async (req, resp)  => {
     }
     if(cookies.isAdmin === "true"){
         result = await queries.createTodoUnsafe(body.desc, user.id)
-        resp.status(200).json({result})
+        resp.status(200).json({id: result.insertId, desc: body.desc })
     } else {
-        return resp.status(401)
+        return resp.status(401).json({msg: 'Unauthorized'})
     }
 }
 

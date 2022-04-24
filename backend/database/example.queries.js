@@ -40,7 +40,6 @@ const Todos = require('../domain/todo')
   
 
   const deleteTodo = async(todoId) => await connection.then((realConnection) => {
-    console.log(`DELETE FROM todo t WHERE t.id = ${todoId}`)
     return realConnection.execute(`DELETE FROM todo t WHERE t.id = ${todoId}`)
   })
 
@@ -51,7 +50,11 @@ const createTodo = async(desc, userId) => await connection.then((realConnection)
   })
 })
 
-const createTodoUnsafe = async(desc, userId) => await connection.execute(`INSERT INTO todo (\`desc\`, user_id) t VALUES ('${desc}', ${userId})`)
+const createTodoUnsafe = async(desc, userId) => await connection.then((realConnection) => {
+  return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
+    return result[0]
+  })
+})
 
   module.exports = {
     getUser,
