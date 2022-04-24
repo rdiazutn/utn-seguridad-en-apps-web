@@ -2,21 +2,31 @@ const connection = require('./database.config')
 const User = require('../domain/user')
 const Todos = require('../domain/todo')
 
-  const getUser = async(username, password) => connection.then((connection) => {
-      return connection.execute(`SELECT * FROM user u WHERE u.username = '${username}' AND u.password = '${password}'`).then((results) => {
+  const getUser = async(username, password) => connection.then((realConnection) => {
+      return realConnection.execute(`SELECT * FROM user u WHERE u.username = '${username}' AND u.password = '${password}'`).then((results) => {
         if(results && results[0] && results[0][0]){
-            const {id,username,password} = results[0][0]
-            return new User({id,username,password}) 
+            const {id,username} = results[0][0]
+            return new User({id,username}) 
         }
         return null
     })
   })
 
+  const getUserByToken = async(token) => connection.then((realConnection) => {
+    return realConnection.execute(`SELECT * FROM user u WHERE u.token = '${token}'`).then((results) => {
+      if(results && results[0] && results[0][0]){
+          const {id,username} = results[0][0]
+          return new User({id,username}) 
+      }
+      return null
+  })
+})
+
   const getUserAndTodosByToken = (token) => connection.then((realConnection) => {
         return realConnection.execute(`SELECT * FROM user u join todo t on t.user_id=u.id WHERE u.token='${token}';`).then((results) => {
             if(results[0] && results[0][0]){
-                const {id,username,password} = results[0][0]
-                const user = new User({id,username,password})
+                const {id,username} = results[0][0]
+                const user = new User({id,username})
                 const todos = results[0].map(data => {return {desc: data.desc, id:data.id}})
                 return {user, todos};
             }
@@ -32,9 +42,14 @@ const Todos = require('../domain/todo')
   const deleteTodo = async(todoId) => await connection.execute(`DELETE FROM todo t WHERE t.id=${todoId}`,);
 
 // TODO: validar injection en createTodo description
-const createTodo =async(desc, userId) => await connection.execute(`INSERT INTO todo (descripcion, user_id) t VALUES ('${desc}', ${userId})`);
+const createTodo = async(desc, userId) => await connection.then((realConnection) => {
+  return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
+    console.log(result)
+    return
+  })
+})
 
-const createTodoUnsafe = async(desc, userId) => await connection.execute(`INSERT INTO todo (descripcion, user_id) t VALUES ('${desc}', ${userId})`)
+const createTodoUnsafe = async(desc, userId) => await connection.execute(`INSERT INTO todo (\`desc\`, user_id) t VALUES ('${desc}', ${userId})`)
 
   module.exports = {
     getUser,
@@ -42,5 +57,6 @@ const createTodoUnsafe = async(desc, userId) => await connection.execute(`INSERT
     saveToken,
     deleteTodo,
     createTodo,
+    getUserByToken,
     createTodoUnsafe
   }

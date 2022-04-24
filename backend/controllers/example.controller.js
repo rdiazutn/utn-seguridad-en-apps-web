@@ -10,10 +10,10 @@ const md5 = require('js-md5')
 const login = async(req, resp) => {
     const {body} = req
     try {
-
         const user = await queries.getUser(body.username, md5(body.password))
         if (!user) {
-            return resp.status(401)
+            resp.status(401).json({msg: 'Unauthorized'})
+            return
         }
         const token = generateToken()
         await queries.saveToken(token, user.id)
@@ -37,30 +37,30 @@ const generateToken = () => {
    return result
 }
 
-const deleteTodo = (req, resp)  => {
+const deleteTodo = async (req, resp)  => {
     const {body} = req
-    queries.deleteTodo(body.todoId)
+    await queries.deleteTodo(body.todoId)
     resp.status(200)
 }
 
-const createTodo  = (req, resp)  => {
+const createTodo  = async (req, resp)  => {
     const {cookies, body} = req
-    const user = queries.getUserByToken(cookies.token)
+    const user = await queries.getUserByToken(cookies.token)
     if(!user){
         return resp.status(401)
     }
-    const result = queries.createTodo(body.desc, user.id)
+    const result = await queries.createTodo(body.desc, user.id)
     resp.status(200).json({result})
 }
 
-const createTodoUnsafe  = (req, resp)  => {
+const createTodoUnsafe  = async (req, resp)  => {
     const {cookies, body} = req
-    const user = queries.getUserByToken(cookies.token)
+    const user = await queries.getUserByToken(cookies.token)
     if(!user){
         return resp.status(401)
     }
     if(cookies.isAdmin === "true"){
-        result = queries.createTodoUnsafe(body.desc, user.id)
+        result = await queries.createTodoUnsafe(body.desc, user.id)
         resp.status(200).json({result})
     } else {
         return resp.status(401)

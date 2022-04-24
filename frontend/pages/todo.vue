@@ -31,13 +31,16 @@
               </v-text-field>
             </v-form>
           </div>
-          <div class="mt-2">
+          <div v-if="loading">
+            <v-progress-circular indeterminate color="primary" />
+          </div>
+          <div v-else class="mt-2">
             <v-list>
               <transition-group name="list" mode="out-in" tag="div">
-                <div v-for="(todo, index) in todos" :key="todo">
+                <div v-for="(todo, index) in todos" :key="todo.id">
                   <v-list-item>
                     <v-list-item-content>
-                      <v-list-item-title>{{ todo.text }}</v-list-item-title>
+                      <v-list-item-title>{{ todo.desc }}</v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
                       <v-tooltip bottom>
@@ -69,35 +72,44 @@ export default {
   data: () => ({
     newTodo: '',
     valid: true,
-    todos: [{
-      id: 1,
-      text: 'Hacer el curso de Vue.js'
-    },
-    {
-      id: 2,
-      text: 'Hacer el curso de Laravel'
-    },
-    {
-      id: 3,
-      text: 'Hacer el curso de React'
-    }]
+    loading: false,
+    todos: []
   }),
+  created () {
+    this.loading = true
+    this.$axios.$get('/api/todos').then((response) => {
+      this.todos = response.todos
+    }).finally(() => {
+      this.loading = false
+    })
+  },
   methods: {
     removeToDo (idx) {
       this.todos.splice(idx, 1)
       this.$refs.form.resetValidation()
     },
-    addToDo () {
+    async addToDo () {
       this.valid = this.$refs.form.validate()
       if (!this.valid) {
         return
       }
-      this.todos.push({
-        id: this.todos.length + 1,
-        text: this.newTodo
-      })
-      this.newTodo = ''
-      this.$refs.form.resetValidation()
+      this.loading = true
+      try {
+        const newTodo = await this.$axios.$post('/api/todos', {
+          desc: this.newTodo
+        })
+        console.log(newTodo)
+        this.todos.push({
+          id: this.todos.length + 1,
+          text: this.newTodo
+        })
+        this.newTodo = ''
+        this.$refs.form.resetValidation()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }
