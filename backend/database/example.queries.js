@@ -40,18 +40,20 @@ const Todos = require('../domain/todo')
   
 
   const deleteTodo = async(todoId) => await connection.then((realConnection) => {
-    return realConnection.execute(`DELETE FROM todo t WHERE t.id = ${todoId}`)
+    return realConnection.execute(`DELETE FROM todo t WHERE t.id = ${realConnection.escape(todoId)}`)
   })
 
 // TODO: validar injection en createTodo description
 const createTodo = async(desc, userId) => await connection.then((realConnection) => {
-  return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
+  console.log(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${realConnection.escape(desc)}', ${userId})`)
+  return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES (${realConnection.escape(desc)}, ${userId})`).then((result) => {
     return result[0]
   })
 })
 
 const createTodoUnsafe = async(desc, userId) => await connection.then((realConnection) => {
-  return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
+  console.log(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`)
+  return realConnection.query(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
     return result[0]
   })
 })

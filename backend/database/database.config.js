@@ -9,7 +9,8 @@ const createConnection = async() => {
     user     :  process.env.DB_USER,
     password :  process.env.DB_PASSWORD,
     database :  process.env.DB_SCHEMA,
-    port:  process.env.DB_PORT
+    port:  process.env.DB_PORT,
+    multipleStatements: true
   });
   scripts.forEach(query => connection.execute(query).then( () => {
     console.log(`Query: ${query} was sucessfully execute `)

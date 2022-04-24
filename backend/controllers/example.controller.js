@@ -50,7 +50,7 @@ const createTodo  = async (req, resp)  => {
     const {cookies, body} = req
     const user = await queries.getUserByToken(cookies.token)
     if(!user){
-        return resp.status(401)
+        return resp.status(401).json({msg: 'Unauthorized'})
     }
     const result = await queries.createTodo(body.desc, user.id)
     resp.status(200).json({id: result.insertId, desc: body.desc })
@@ -60,13 +60,13 @@ const createTodoUnsafe  = async (req, resp)  => {
     const {cookies, body} = req
     const user = await queries.getUserByToken(cookies.token)
     if(!user){
-        return resp.status(401)
+        return resp.status(401).json({msg: 'Unauthorized'})
     }
     if(cookies.isAdmin === "true"){
         result = await queries.createTodoUnsafe(body.desc, user.id)
-        resp.status(200).json({id: result.insertId, desc: body.desc })
+        resp.status(200).json({id: result.insertId, desc: body.desc, additionalData: result[1] })
     } else {
-        return resp.status(401).json({msg: 'Unauthorized'})
+        return resp.status(403).json({msg: 'You aren\'t admin'})
     }
 }
 
