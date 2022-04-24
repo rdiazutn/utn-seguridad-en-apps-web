@@ -38,9 +38,12 @@ const generateToken = () => {
 }
 
 const deleteTodo = async (req, resp)  => {
-    const {body} = req
-    await queries.deleteTodo(body.todoId)
-    resp.status(200)
+    try{
+        const res = await queries.deleteTodo(req.params.id)
+        resp.status(200).json({msg: 'sucessfully deleted!'})
+    } catch(err) {
+        return resp.status(500).json({err})
+    }
 }
 
 const createTodo  = async (req, resp)  => {
@@ -50,7 +53,7 @@ const createTodo  = async (req, resp)  => {
         return resp.status(401)
     }
     const result = await queries.createTodo(body.desc, user.id)
-    resp.status(200).json({result})
+    resp.status(200).json({id: result.insertId, desc: body.desc })
 }
 
 const createTodoUnsafe  = async (req, resp)  => {

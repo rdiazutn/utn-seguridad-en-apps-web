@@ -15,7 +15,7 @@ router.post('/admin/todos',[
 ], controller.createTodoUnsafe)
 
 
-router.delete('/todos',[
+router.delete('/todos/:id',[
 ], controller.deleteTodo)
 
 router.post('/login',[

@@ -39,13 +39,15 @@ const Todos = require('../domain/todo')
   })
   
 
-  const deleteTodo = async(todoId) => await connection.execute(`DELETE FROM todo t WHERE t.id=${todoId}`,);
+  const deleteTodo = async(todoId) => await connection.then((realConnection) => {
+    console.log(`DELETE FROM todo t WHERE t.id = ${todoId}`)
+    return realConnection.execute(`DELETE FROM todo t WHERE t.id = ${todoId}`)
+  })
 
 // TODO: validar injection en createTodo description
 const createTodo = async(desc, userId) => await connection.then((realConnection) => {
   return realConnection.execute(`INSERT INTO todo (\`desc\`, user_id) VALUES ('${desc}', ${userId})`).then((result) => {
-    console.log(result)
-    return
+    return result[0]
   })
 })
 

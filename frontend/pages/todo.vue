@@ -45,7 +45,7 @@
                     <v-list-item-action>
                       <v-tooltip bottom>
                         <template #activator="{ on, attrs }">
-                          <v-btn icon v-bind="attrs" @click="removeToDo(index)" v-on="on">
+                          <v-btn icon v-bind="attrs" :loading="deleting" @click="removeToDo(todo.id, index)" v-on="on">
                             <v-icon color="info">
                               mdi-check
                             </v-icon>
@@ -73,6 +73,7 @@ export default {
     newTodo: '',
     valid: true,
     loading: false,
+    deleting: false,
     todos: []
   }),
   created () {
@@ -84,9 +85,17 @@ export default {
     })
   },
   methods: {
-    removeToDo (idx) {
-      this.todos.splice(idx, 1)
-      this.$refs.form.resetValidation()
+    async removeToDo (id, index) {
+      this.deleting = true
+      try {
+        await this.$axios.$delete(`/api/todos/${id}`)
+        this.todos.splice(index, 1)
+        this.$refs.form.resetValidation()
+      } catch (err) {
+        console.error(err)
+      } finally {
+        this.deleting = false
+      }
     },
     async addToDo () {
       this.valid = this.$refs.form.validate()
@@ -98,11 +107,7 @@ export default {
         const newTodo = await this.$axios.$post('/api/todos', {
           desc: this.newTodo
         })
-        console.log(newTodo)
-        this.todos.push({
-          id: this.todos.length + 1,
-          text: this.newTodo
-        })
+        this.todos.push(newTodo)
         this.newTodo = ''
         this.$refs.form.resetValidation()
       } catch (err) {
