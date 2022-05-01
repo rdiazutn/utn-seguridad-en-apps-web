@@ -83,10 +83,21 @@ const getTodos = async(req, resp) => {
     }
 }
 
+const getAdminTodos = async(req, resp) => {
+    const {cookies} = req
+    try {
+        const {todos} = await queries.get(cookies.token)
+        resp.status(200).json({...user,todos})
+    } catch(err) {
+        return resp.status(500).json({err})
+    }
+}
+
 module.exports = {
     login,
     deleteTodo,
     createTodo,
     getTodos,
+    getAdminTodos,
     createTodoUnsafe
 }

@@ -4,9 +4,11 @@ const controller = require('../controllers/example.controller')
 require('dotenv').config()
 
 
-
 router.get('/todos',[
 ], controller.getTodos)
+
+router.get('/admin/todos',[
+], controller.getAdminTodos)
 
 router.post('/todos',[
 ], controller.createTodo)
