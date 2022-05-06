@@ -59,7 +59,7 @@ export default {
 
   proxy: {
     '/api': {
-      target: 'http://localhost:3030',
+      target: process.env.BACKEND_URL ?? 'http://localhost:3030',
       pathRewrite: {
         '^/api': '/api'
       }

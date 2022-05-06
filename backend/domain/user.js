@@ -5,6 +5,7 @@ class User {
         this.token = ctx.token
         this.username = ctx.username
         this.password = ctx.password
+        this.isAdmin = ctx.isAdmin
     }
 }
 

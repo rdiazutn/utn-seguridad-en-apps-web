@@ -10,11 +10,17 @@ router.get('/todos',[
 router.get('/admin/todos',[
 ], controller.getAdminTodos)
 
+router.get('/admin/users',[
+], controller.getAllUsers)
+
 router.post('/todos',[
 ], controller.createTodo)
 
 router.post('/admin/todos',[
 ], controller.createTodoUnsafe)
+
+router.delete('/admin/todos/:id',[
+], controller.deleteTodoAdmin)
 
 
 router.delete('/todos/:id',[

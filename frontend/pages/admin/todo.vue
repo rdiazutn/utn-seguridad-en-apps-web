@@ -3,10 +3,19 @@
     <v-col cols="12" sm="8" md="6" lg="4">
       <v-card>
         <v-card-title class="px-8">
+          Bienvenido, administrador<br>
           Escriba aquí el to-do a agregar
         </v-card-title>
         <v-card-text>
-          <div class="px-4">
+          <v-combobox
+            v-model="selectedUser"
+            :items="users"
+            item-text="username"
+            label="Usuario"
+            outlined
+            dense
+          />
+          <div class="px-4 mb-4">
             <v-form ref="form" class="d-flex align-center" @submit.prevent="addToDo">
               <v-text-field
                 v-model="newTodo"
@@ -40,7 +49,9 @@
                 <div v-for="(todo, index) in todos" :key="todo.id">
                   <v-list-item>
                     <v-list-item-content>
-                      <v-list-item-title>{{ todo.desc }}</v-list-item-title>
+                      <v-list-item-title>
+                        <b>{{ todo.user }}</b> - {{ todo.desc }}
+                      </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
                       <v-tooltip bottom>
@@ -74,12 +85,21 @@ export default {
     valid: true,
     loading: false,
     deleting: false,
-    todos: []
+    selectedUser: null,
+    todos: [],
+    users: []
   }),
   created () {
     this.loading = true
-    this.$axios.$get('/api/todos').then((response) => {
+
+    this.$axios.$get('/api/admin/todos').then((response) => {
       this.todos = response.todos
+    }).finally(() => {
+      this.loading = false
+    })
+
+    this.$axios.$get('/api/admin/users').then((response) => {
+      this.users = response.users
     }).finally(() => {
       this.loading = false
     })
@@ -88,7 +108,7 @@ export default {
     async removeToDo (id, index) {
       this.deleting = true
       try {
-        await this.$axios.$delete(`/api/todos/${id}`)
+        await this.$axios.$delete(`/api/admin/todos/${id}`)
         this.todos.splice(index, 1)
         this.$refs.form.resetValidation()
       } catch (err) {
@@ -105,7 +125,8 @@ export default {
       this.loading = true
       try {
         const newTodo = await this.$axios.$post('/api/admin/todos', {
-          desc: this.newTodo
+          desc: this.newTodo,
+          selectedUser: this.selectedUser
         })
         this.todos.push(newTodo)
         this.newTodo = ''

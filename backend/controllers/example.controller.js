@@ -18,7 +18,7 @@ const login = async(req, resp) => {
         const token = generateToken()
         await queries.saveToken(token, user.id)
     
-        return resp.status(200).cookie('token', token).cookie('isAdmin', 'false').json({msg: 'sucessfully login!'})
+        return resp.status(200).cookie('token', token).json({msg: 'sucessfully login!'})
         
     }catch (err){
         console.log('Login Error: ', err)
@@ -59,12 +59,14 @@ const createTodo  = async (req, resp)  => {
 const createTodoUnsafe  = async (req, resp)  => {
     const {cookies, body} = req
     const user = await queries.getUserByToken(cookies.token)
+    const selectedUser = body.selectedUser;
+
     if(!user){
         return resp.status(401).json({msg: 'Unauthorized'})
     }
     if(cookies.isAdmin === "true"){
-        result = await queries.createTodoUnsafe(body.desc, user.id)
-        resp.status(200).json({id: result.insertId, desc: body.desc, additionalData: result[1] })
+        result = await queries.createTodoUnsafe(body.desc, selectedUser.id)
+        resp.status(200).json({id: result.insertId, desc: body.desc, user: selectedUser.username, additionalData: result[1] })
     } else {
         return resp.status(403).json({msg: 'You aren\'t admin'})
     }
@@ -85,10 +87,47 @@ const getTodos = async(req, resp) => {
 
 const getAdminTodos = async(req, resp) => {
     const {cookies} = req
+    const user = await queries.getUserByToken(cookies.token)
+    const isAdmin = user.isAdmin;
+
     try {
-        const {todos} = await queries.get(cookies.token)
-        resp.status(200).json({...user,todos})
+        const {todos} = await queries.getAllTodo(cookies.token)
+        resp.status(200).cookie('isAdmin', isAdmin).json({todos})
     } catch(err) {
+        console.error(err)
+        return resp.status(500).json({err})
+    }
+}
+
+const deleteTodoAdmin = async (req, resp)  => {
+    const {cookies, params} = req
+
+    const id = params.id;
+
+    const user = await queries.getUserByToken(cookies.token)
+
+    if(!user){
+        return resp.status(401).json({msg: 'Unauthorized'})
+    }
+
+    if(cookies.isAdmin === "true"){
+        try{
+            const res = await queries.deleteTodo(id)
+            resp.status(200).json({msg: 'sucessfully deleted!'})
+        } catch(err) {
+            return resp.status(500).json({err})
+        }
+    } else {
+        return resp.status(403).json({msg: 'You aren\'t admin'})
+    }
+}
+
+const getAllUsers = async(req, resp) => {
+    try {
+        const users = await queries.getAllUsers();
+        return resp.status(200).json({users})
+    } catch (err){
+        console.log('Login Error: ', err)
         return resp.status(500).json({err})
     }
 }
@@ -99,5 +138,7 @@ module.exports = {
     createTodo,
     getTodos,
     getAdminTodos,
-    createTodoUnsafe
+    createTodoUnsafe,
+    deleteTodoAdmin,
+    getAllUsers
 }

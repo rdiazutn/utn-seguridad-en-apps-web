@@ -15,8 +15,8 @@ const getUser = async(username, password) => connection.then((realConnection) =>
 const getUserByToken = async(token) => connection.then((realConnection) => {
   return realConnection.execute(`SELECT * FROM user u WHERE u.token = '${token}'`).then((results) => {
     if(results && results[0] && results[0][0]){
-        const {id,username} = results[0][0]
-        return new User({id,username}) 
+        const {id,username,isAdmin} = results[0][0]
+        return new User({id,username,token,isAdmin}) 
     }
     return null
   })
@@ -35,9 +35,9 @@ const getUserAndTodosByToken = (token) => connection.then((realConnection) => {
 })
 
 const getAllTodo = () => connection.then((realConnection) => {
-  return realConnection.execute(`SELECT t.desc, u.username FROM todo t JOIN user u on u.id = t.user_id;`).then((results) => {
+  return realConnection.execute(`SELECT t.desc, t.id, u.username FROM todo t JOIN user u on u.id = t.user_id;`).then((results) => {
       if(results[0] && results[0][0]){
-          const todos = results[0].map(data => {return {desc: data.desc, id:data.id}})
+          const todos = results[0].map(data => {return {desc: data.desc, id:data.id, user: data.username}})
           return {todos};
       }
       return {todos:null}
@@ -68,6 +68,16 @@ const createTodoUnsafe = async(desc, userId) => await connection.then((realConne
   })
 })
 
+const getAllUsers = async() => connection.then((realConnection) => {
+    return realConnection.execute(`SELECT * FROM user`).then((results) => {
+      if(results && results[0]){
+        return results[0].map(data => new User({id: data.id, username: data.username}))
+      }
+
+      return []
+  })
+})
+
   module.exports = {
     getUser,
     getUserAndTodosByToken,
@@ -76,5 +86,6 @@ const createTodoUnsafe = async(desc, userId) => await connection.then((realConne
     deleteTodo,
     createTodo,
     getUserByToken,
-    createTodoUnsafe
+    createTodoUnsafe,
+    getAllUsers
   }
