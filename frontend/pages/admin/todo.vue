@@ -7,37 +7,42 @@
           Escriba aquí el to-do a agregar
         </v-card-title>
         <v-card-text>
-          <v-combobox
-            v-model="selectedUser"
-            :items="users"
-            item-text="username"
-            label="Usuario"
-            outlined
-            dense
-          />
           <div class="px-4 mb-4">
-            <v-form ref="form" class="d-flex align-center" @submit.prevent="addToDo">
-              <v-text-field
-                v-model="newTodo"
-                label="To-do"
-                placeholder="Ingrese su TO-DO"
-                :rules="[v => !!v || 'Por favor ingrese su to-do']"
-              >
-                <template #append>
-                  <v-tooltip bottom>
-                    <template #activator="{ on, attrs }">
-                      <v-btn icon v-bind="attrs" type="submit" v-on="on">
-                        <v-icon color="primary">
-                          mdi-plus
-                        </v-icon>
-                      </v-btn>
-                    </template>
-                    <template #default>
-                      Agregar
-                    </template>
-                  </v-tooltip>
-                </template>
-              </v-text-field>
+            <v-form ref="form" class="align-center" @submit.prevent="addToDo">
+              <div>
+                <v-combobox
+                  v-model="selectedUser"
+                  :items="users"
+                  item-text="username"
+                  label="Usuario"
+                  outlined
+                  dense
+                />
+              </div>
+              <div>
+                <v-text-field
+                  v-model="newTodo"
+                  outlined
+                  label="To-do"
+                  placeholder="Ingrese su TO-DO"
+                  :rules="[v => !!v || 'Por favor ingrese su to-do']"
+                >
+                  <template #append>
+                    <v-tooltip bottom>
+                      <template #activator="{ on, attrs }">
+                        <v-btn icon v-bind="attrs" type="submit" v-on="on">
+                          <v-icon color="primary">
+                            mdi-plus
+                          </v-icon>
+                        </v-btn>
+                      </template>
+                      <template #default>
+                        Agregar
+                      </template>
+                    </v-tooltip>
+                  </template>
+                </v-text-field>
+              </div>
             </v-form>
           </div>
           <div v-if="loading">
